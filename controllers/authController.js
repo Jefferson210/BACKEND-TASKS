@@ -15,12 +15,12 @@ exports.autenticarUsuario = async (req, res) => {
     //Revisar que sea un usuario reistrado
     let usuario = await Usuario.findOne({ email });
     if (!usuario) {
-      return res.status(400).json({ msg: "El usuario no existe" });
+      return res.status(400).json({ msg: "Email o Password incorrecto" });
     }
     //Revisar el password
     const passCorrecto = await bcryptjs.compare(password, usuario.password);
     if (!passCorrecto) {
-      return res.status(400).json({ msg: "Password Incorrecto" });
+      return res.status(400).json({ msg: "Email o Password incorrecto" });
     }
     //Si todo es correcto
     //Cear y firmar el jwt
@@ -44,5 +44,15 @@ exports.autenticarUsuario = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
+  }
+};
+
+//Obtiene el usuario autenticado
+exports.usuarioAutenticado = async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select("-password");
+    res.json({ usuario });
+  } catch (error) {
+    res.status(500).json({ msg: "Hubo un error" });
   }
 };
